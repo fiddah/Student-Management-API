@@ -18,7 +18,7 @@ from flask_jwt_extended import JWTManager
 from werkzeug.exceptions import NotFound, MethodNotAllowed
 from http import HTTPStatus
 
-def create_app(config=config_dict['dev']):
+def create_app(config=config_dict['prod']):
     app = Flask(__name__)
 
 

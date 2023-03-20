@@ -28,6 +28,22 @@ def create_app(config=config_dict['dev']):
 
     migrate = Migrate(app, db)
 
+    authorizations = {
+        "Bearer Auth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Add a JWT token to the header with ** Bearer &lt;JWT&gt; token to authorize** "
+        }
+    }
+
+    api = Api(app,
+        title='Student Management API',
+        description='A simple student management REST API service',
+        authorizations=authorizations,
+        security='Bearer Auth'
+    )
+
     jwt = JWTManager(app)
     app.config["JWT_SECRET_KEY"] = "super-secret"
 
@@ -60,32 +76,16 @@ def create_app(config=config_dict['dev']):
     def missing_token_callback(error):
         return {
             "message": "Request is missing an access token",
-            "error": "authorization_required"
+            "error": "authorization_required!"
         }, HTTPStatus.UNAUTHORIZED
     
     @jwt.needs_fresh_token_loader
     def token_not_fresh_callback():
         return {
             "message": "The token is not fresh",
-            "error": "fresh_token_required"
+            "error": "fresh_token_required!"
         }, HTTPStatus.UNAUTHORIZED
 
-    authorizations = {
-        "Bearer Auth": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "Authorization",
-            "description": "Add a JWT token to the header with ** Bearer &lt;JWT&gt; ** token to authorize"
-        }
-    }
-
-    api = Api(
-        app,
-        title='Student Management API',
-        description='A student management REST API service',
-        authorizations=authorizations,
-        security='Bearer Auth'
-        )
 
     api.add_namespace(auth_namespace, path='/auth')
     api.add_namespace(admin_namespace, path='/admin')

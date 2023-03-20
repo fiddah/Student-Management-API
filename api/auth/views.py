@@ -28,15 +28,15 @@ login_model = auth_namespace.model(
 )
 
 @auth_namespace.route('/users')
-class GetAllUsers(Resource):
+class GetUsers(Resource):
     @auth_namespace.marshal_with(user_model)
     @auth_namespace.doc(
-        description="Retrieve all users"
+        description="Retrieves all users"
     )
     @admin_required()
     def get(self):
         """
-            Retrieve all Users - Admins Only
+            Retrieves all Users --> Admins Only
         """
         users = User.query.all()
 
@@ -49,7 +49,8 @@ class Login(Resource):
         """
             Generate JWT Token
         """
-        data = auth_namespace.payload
+        data = request.get_json()
+
 
         email = data['email']
         password = data['password']
@@ -62,7 +63,7 @@ class Login(Resource):
 
             response = {
                 'access_token': access_token,
-                'refresh_token': refresh_token
+                'refresh_token': refresh_token,
             }
 
             return response, HTTPStatus.CREATED
@@ -93,4 +94,4 @@ class Logout(Resource):
         jti = token["jti"]
         token_type = token["type"]
         BLACKLIST.add(jti)
-        return {"message": f"{token_type.capitalize()} token successfully revoked"}, HTTPStatus.OK
+        return {"message": f"{token_type.capitalize()} token successfully revoked"}, HTTPStatus.OK        
